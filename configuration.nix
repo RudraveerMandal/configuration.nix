@@ -26,26 +26,20 @@
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
   fileSystems."/" =
-    { device = "/dev/disk/by-uuid/86a24b3b-8802-4768-a699-2043d3d182d7";
-      fsType = "btrfs";
-      options = [ "subvol=root" ];
+    { device = "none";
+      fsType = "tmpfs";
+      options = [ "defaults" "size=500M" "mode=755" ];
     };
-  fileSystems."/home" =
-    { device = "/dev/disk/by-uuid/86a24b3b-8802-4768-a699-2043d3d182d7";
+  fileSystems."/nix" =
+    { device = "/dev/sda3";
       fsType = "btrfs";
-      options = [ "subvol=home" ];
-    };
-  fileSystems."/var" =
-    { device = "/dev/disk/by-uuid/86a24b3b-8802-4768-a699-2043d3d182d7";
-      fsType = "btrfs";
-      options = [ "subvol=var" ];
     };
   fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/6CC2-BB45";
+    { device = "/dev/sda1";
       fsType = "vfat";
     };
   swapDevices =
-    [ { device = "/dev/disk/by-uuid/22acad2e-296b-4eea-8657-31d7c7058b87"; }
+    [ { device = "/dev/sda2"; }
     ];
   powerManagement.cpuFreqGovernor = lib.mkDefault "powersave";
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
@@ -81,10 +75,13 @@
     pulse.enable = true;
   };
   services.xserver.libinput.enable = true;
+  users.mutableUsers = false;
   users.users.magphi = {
      isNormalUser = true;
      extraGroups = [ "wheel" "networkmanager" "video" "audio" ];
+     initialHashedPassword = "$6$bAdD2kAwUHGKN8Iv$WwS4bvAV3L4fGdZ4JxNIVm85YIjqVZFhEDCgq0VlTwF.t4EH0h/2ab27.qzm8pvBdcDFd5unxtNXOMEzb8GZq/"; 
   };
+  users.users.root.initialHashedPassword = "$6$bAdD2kAwUHGKN8Iv$WwS4bvAV3L4fGdZ4JxNIVm85YIjqVZFhEDCgq0VlTwF.t4EH0h/2ab27.qzm8pvBdcDFd5unxtNXOMEzb8GZq/";
   environment.systemPackages = with pkgs; [
     neovim
     emacs
@@ -108,6 +105,16 @@
     bluez-tools
   ];
   system.stateVersion = "unstable";
+  environment.etc."machine-id".source = "/nix/persist/etc/machine-id";
+  environment.etc."nixos".source = "/nix/persist/etc/nixos";
+  environment.etc."../var/log".source = "/nix/persist/var/log";
+  environment.etc."../others".source = "/nix/persist/others";  
+  environment.etc."NetworkManager/system-connections".source = "/nix/persist/etc/NetworkManager/system-connections";
+  environment.etc."../root/.nix-channels".text = ''
+    https://nixos.org/channels/nixos-unstable nixos
+    https://nixos.org/channels/nixpkgs-unstable nixpkgs
+    https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager     
+  '';
   home-manager.users.magphi = {
     home.file.".bashrc".text = ''
       [[ $- != *i* ]] && return
@@ -121,6 +128,12 @@
       export PATH="$PATH:$HOME/bin"
       [ -f "/home/magphi/.ghcup/env" ] && source "/home/magphi/.ghcup/env"
       fish
+    '';
+    home.file.".gitconfig".source = /nix/persist/home/.gitconfig;
+    home.file.".nix-channels".text = ''
+      https://nixos.org/channels/nixos-unstable nixos
+      https://nixos.org/channels/nixpkgs-unstable nixpkgs
+      https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager
     '';
     home.file.".minecraft/config".source = ./.minecraft/config;
     home.file.".minecraft/resourcepacks".source = ./.minecraft/resourcepacks;
