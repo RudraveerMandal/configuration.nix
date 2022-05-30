@@ -4,12 +4,22 @@
     [ <home-manager/nixos> (modulesPath + "/installer/scan/not-detected.nix") ];
   nixpkgs.config.allowBroken = true;
   nixpkgs.config.allowUnfree = true;
+  hardware.bluetooth.enable = true;
   boot.kernelPackages = pkgs.linuxPackages_zen;
   nix = {
     package = pkgs.nixFlakes;
     extraOptions = ''
       experimental-features = nix-command flakes
     '';
+  };
+  programs.steam = {
+    enable = true;
+    remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
+    dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
+  };
+  virtualisation = {
+    waydroid. enable = true;
+    lxd.enable = true;
   };
   boot.initrd.availableKernelModules = [ "xhci_pci" "ahci" "usb_storage" "sd_mod" "rtsx_pci_sdmmc" ];
   boot.initrd.kernelModules = [ ];
@@ -94,6 +104,8 @@
     spotify
     home-manager
     wget
+    bluez
+    bluez-tools
   ];
   system.stateVersion = "unstable";
   home-manager.users.magphi = {
