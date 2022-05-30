@@ -1,0 +1,14 @@
+#
+#waypoint:name:initials:x:y:z:color:disabled:type:set:rotate_on_tp:tp_yaw:global
+#
+waypoint:Swamp:S:26340:68:25690:14:false:0:gui.xaero_default:false:0:false
+waypoint:Forest:F:26161:79:25910:1:false:0:gui.xaero_default:false:0:false
+waypoint:Forest:F:25947:64:25603:8:false:0:gui.xaero_default:false:0:false
+waypoint:Forest:F:25705:63:25745:1:false:0:gui.xaero_default:false:0:false
+waypoint:Farm:F:25493:63:25849:11:false:0:gui.xaero_default:false:0:false
+waypoint:Mine:M:25474:67:25876:10:false:0:gui.xaero_default:false:0:false
+waypoint:Forest:F:25561:65:25905:0:false:0:gui.xaero_default:false:0:false
+waypoint:Farm:F:25749:63:25890:12:false:0:gui.xaero_default:false:0:false
+waypoint:Forest:F:25976:74:25945:11:false:0:gui.xaero_default:false:0:false
+waypoint:Ravine:R:25595:44:25842:8:false:0:gui.xaero_default:false:0:false
+waypoint:Animals:U:25584:69:25811:3:false:0:gui.xaero_default:false:0:false

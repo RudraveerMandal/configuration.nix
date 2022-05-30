@@ -1,0 +1,168 @@
+#+OPTIONS: toc:2
+
+* My configuration.nix
+*** For some weird reason you decided to look at my configuration and are thinking about taking stuff from it. If you want to use it, go through it and take inspiration from it. But do not copy paste it as it needs to be personalized and will only work for me.
+**** If you find something wrong in the configs, please let me know using a bug report or issue.
+
+** NOTE: The configuration.nix wont break your system, but the configs listed here aren't completed yet. 
+
+* The etc folder
+**** The configs in this folder go into the /etc folder. The /etc folder hosts system-wide configs.
+*** Dunst is a lightweight notification utility. The changes I have made:
+**** Set monitor to 0 (1 monitor setup)
+**** Set width and height to 300 (pixels)
+**** Set the place for the notifications to top right
+**** Instead of displaying the notification completely top right, it displays it 10 pixels left and 50 pixels down from the corner
+**** Added a bit of colour to the notifications
+**** Made font monospace
+
+* The home folder
+*** The home folder contains configs that go into your /home/username folder.
+** .bashrc
+*** The .bashrc file contains a startup script when you open up a terminal. The changes I have made:
+**** Checks for interactivity and doesn't load the rest of the script if not interactive
+**** Makes ls colourful
+**** Defines the string you get before typing a command as "user@hostname"
+**** Exports the editor as emacs
+**** Runs neofetch because who doesn't like to see neofetch
+**** Enables using the touchpad while typing. Can be helpful for playing games but also the opposite sometimes.
+**** If I login in the first tty (the tty it throws you into after booting) it will autostart xmonad. This is required because I do not use a desktop manager.
+**** Exports the path of Node Version Manager
+**** Exports the path of binaries compiled for just the user
+**** Exports the ghcup path
+**** Starts fish (I do not know how to configure fish so using a bashrc to do everything and then start fish with all the env setup is easier)
+
+** .emacs.d folder
+*** The folder contains the init and config files for emacs. It is written in elisp. See the README in that folder for more info.
+** .minecraft folder
+*** This folder is used for minecraft settings, resourcepacks, shaderpacks and mods. Stuff I have changed:
+**** Using fabric and fabric api
+**** Using sodium, lithium and phosphorus to increase fps
+**** Using dokucraft as a resourcepack
+**** Changed controls
+** .Spacevim folder, .Spacevim.d folder, .vim folder, vim folder
+*** These folders are used to configure Spacevim and vim
+** .vscode folder
+*** Used for configuring vscode. Stuff I have changed:
+**** Installed a hydroxy theme which looks pretty cool
+**** Installed Material Icon Theme
+**** Installed these extensions:
+***** Auto close tag for HTML
+***** Auto complete tag for HTML
+***** Auto rename tag for HTML
+***** Beautify code
+***** Better C++ Syntax
+***** Better comments
+***** C/C++
+***** Colour picker for CSS
+***** Django
+***** Docker
+***** ESLint
+***** ETHover
+***** Formatter Hero
+***** Github
+***** Github Codespaces
+***** Github Copilot
+***** Github Repositories
+***** Gitlab Workflow
+***** Gitlens
+***** Go
+***** Google complete me
+***** Google search
+***** GraphQL
+***** Haskell
+***** Haskell GHCi
+***** Haskell Syntax Highlighting
+***** Haskell Linter
+***** HTML Boilerplate
+***** HTML Play
+***** HTML Snippets
+***** HTML Tag Wrapper
+***** Inline Bookmark
+***** Intellicode
+***** Jupyter
+***** Jupyter Keymaps
+***** Jupyter Notebook Renderer
+***** Live Server
+***** Node.js Modules Intellisense
+***** Nodejs Modules Snippet
+***** Nodejs Snippets
+***** npm
+***** npm Intellisense
+***** Paste JSON as code
+***** Path Intellisense
+***** Prettier
+***** Pylance
+***** Python
+***** Quokka.js
+***** Remote - Containers
+***** Remote - SSH
+***** Remote - SSH: Editing Configuration Files
+***** Remote - WSL
+***** Remote Development
+***** Rust
+***** Rust-Analyzer
+***** Settings Sync
+***** Synk Security
+***** Solidity
+***** Solidity Contract Flattener
+***** Solidity Debugger
+***** Solidity Extended
+***** Solidity Language and Themes
+***** Solidity Visual Developer
+***** Svelte 3 snippets
+***** Svelte
+***** Svelte Intellisense
+***** Tabnine AI Autocomplete
+***** Tabnine CSS Intellisense
+***** Tailwind Shades
+***** Todo Tree
+***** Virutal Documents Spy
+***** HTML Preview
+** Wallpapers folder
+*** Contains wallpapers for XMonad
+** .xinitrc
+*** This file contains what xorg should run when startx is called. I have made it so that it starts XMonad.
+** .xmonad folder
+*** This folder contains xmonad config files. Xmonad is a window manager written in haskell and configured in Haskell.
+
+* The .config folder
+*** Hosts more config files
+** eww folder
+*** Eww is a widget utility that allows you to implement widgets in any window manager.
+** Greenclip.toml
+*** Greenclip is a clipboard utility. Changes I have made are as follows:
+**** Enabled Image Support
+**** Enabled a history file
+**** Enabled an image cache directory
+** mpv folder
+*** This is the config folder for mpv, a video player. Yes you can even configure a video player!
+** neofetch folder
+*** This changes how neofetch displays output. Changes I have made:
+**** Disabled HOST
+**** Disabled Resolution
+**** Disabled CPU
+**** Disabled GPU
+**** Enabled Memory
+**** Enabled Disk
+**** Enabled Battery
+**** Disabled Kernel Shorthand
+**** Enabled Memory Percentage
+**** Made it show disk percentage of root and efi partitions
+**** Made it display the old redhat logo because I think its cool
+** nvim folder
+*** This folder has nvim configs
+** picom.conf
+*** Picom is a compositor which does half the work of a window manager and is used to customize the look and feel of a window manager.
+** qtile
+*** Qtile is a window manager written in python.
+** Qutebrowser
+*** Qutebrowser is a browser which uses the WebKitQt engine written in Python. It is as fast as chromium while being ligtweight and having vim-like keybindings.
+** Rofi
+*** Rofi is an app launcher. Changes I have made:
+**** Set the theme to Arc-Dark
+**** Set the font to Fira Code 22
+** Tint2
+*** Tint2 is a panel for system tray and other stuff.
+
+* Thats it!

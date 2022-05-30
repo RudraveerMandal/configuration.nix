@@ -1,0 +1,12 @@
+#
+#waypoint:name:initials:x:y:z:color:disabled:type:set:rotate_on_tp:tp_yaw:global
+#
+waypoint:gui.xaero_deathpoint:D:-6:60:8:0:false:1:gui.xaero_default:false:0:true
+waypoint:gui.xaero_deathpoint_old:D:12:60:15:0:false:2:gui.xaero_default:false:0:true
+waypoint:gui.xaero_deathpoint_old:D:10581:30:-2761:0:false:2:gui.xaero_default:false:0:true
+waypoint:gui.xaero_deathpoint_old:D:10566:-50:-2864:0:false:2:gui.xaero_default:false:0:true
+waypoint:Kolkata:K:10580:63:-2687:1:false:0:gui.xaero_default:false:0:false
+waypoint:Purba Medinipur:P:10536:63:-2611:10:false:0:gui.xaero_default:false:0:false
+waypoint:Howrah:H:10563:63:-2697:12:false:0:gui.xaero_default:false:0:false
+waypoint:Uluberia:U:10581:62:-2728:10:false:0:gui.xaero_default:false:0:false
+waypoint:Logan:J:9949:62:-2090:12:false:0:gui.xaero_default:false:0:false
