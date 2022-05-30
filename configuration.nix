@@ -381,6 +381,10 @@
       config.bind(',sd', 'config-cycle content.user_stylesheets ~/.config/qutebrowser/solarized-everything-css/css/solarized-dark/solarized-dark-all-sites.css ""')
       config.bind(',sl', 'config-cycle content.user_stylesheets ~/.config/qutebrowser/solarized-everything-css/css/solarized-light/solarized-light-all-sites.css ""')
     '';
+    home.file.".config/qutebrowser/autoconfig.yml".source = /nix/persist/home/qutebrowser/autoconfig.yml;
+    home.file.".config/qutebrowser/greasemonkey".source = /nix/persist/home/qutebrowser/greasemonkey;
+    home.file.".config/qutebrowser/bookmarks".source = /nix/persist/home/qutebrowser/bookmarks;
+    home.file.".config/qutebrowser/quickmarks".source = /nix/persist/home/qutebrowser/quickmarks;
     home.file.".config/rofi/config".text = ''
       rofi.theme:	Arc-Dark
       rofi.font:	Fira Code 22
