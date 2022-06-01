@@ -33,10 +33,40 @@
   fileSystems."/nix" =
     { device = "/dev/sda3";
       fsType = "btrfs";
+      options = [ "defaults" "ssd" "space_cache" "subvol=nix" ];
     };
   fileSystems."/boot" =
     { device = "/dev/sda1";
       fsType = "vfat";
+    };
+  fileSystems."/var/log" =
+    { device = "/dev/sda3";
+      options = [ "defaults" "ssd" "space_cache" "subvol=var/log" ];
+      fsType = "btrfs";
+    };
+  fileSystems."/etc/nixos" =
+    { device = "/dev/sda3";
+      options = [ "defaults" "ssd" "space_cache" "subvol=etc/nixos" ];
+      fsType = "btrfs";
+    };
+  fileSystems."/var/lib" =
+    { device = "/dev/sda3";
+      options = [ "defaults" "ssd" "space_cache" "subvol=var/lib" ];
+      fsType = "btrfs";
+    };
+  fileSystems."/etc/NetworkManager/system-connections" = 
+    { device = "/dev/sda3";
+      options = [ "defaults" "ssd" "space_cache" "subvol=etc/NetworkManager/system-connections" ];
+      fsType = "btrfs";
+    };
+  fileSystems."/home" =
+    { device = "/dev/sda3";
+      options = [ "defaults" "ssd" "space_cache" "subvol=home" ];
+      fsType = "btrfs";
+    };
+  fileSystems."/root/.nix-channels" =
+    { device = "/home/magphi/.nix-channels";
+      options = [ "bind" ];
     };
   swapDevices =
     [ { device = "/dev/sda2"; }
@@ -54,15 +84,9 @@
     keyMap = "us";
   };
   services.xserver.enable = true;
-  services.xserver.displayManager.defaultSession = "none+xmonad";
+  services.xserver.displayManager.defaultSession = "none+qtile";
   services.xserver.windowManager = {
-    xmonad.enable = true;
-    xmonad.enableContribAndExtras = true;
-    xmonad.extraPackages = hpkgs: [
-    hpkgs.xmonad
-    hpkgs.xmonad-contrib
-    hpkgs.xmonad-extras
-    ];
+    qtile.enable = true;
   };
   services.xserver.layout = "us";
   services.printing.enable = true;
@@ -86,7 +110,6 @@
     neovim
     emacs
     ungoogled-chromium
-    rofi
     git
     alacritty
     fish
@@ -103,18 +126,11 @@
     wget
     bluez
     bluez-tools
+    node2nix
+    python
+    feh
   ];
-  system.stateVersion = "unstable";
-  environment.etc."machine-id".source = "/nix/persist/etc/machine-id";
-  environment.etc."nixos".source = "/nix/persist/etc/nixos";
-  environment.etc."../var/log".source = "/nix/persist/var/log";
-  environment.etc."../others".source = "/nix/persist/others";  
-  environment.etc."NetworkManager/system-connections".source = "/nix/persist/etc/NetworkManager/system-connections";
-  environment.etc."../root/.nix-channels".text = ''
-    https://nixos.org/channels/nixos-unstable nixos
-    https://nixos.org/channels/nixpkgs-unstable nixpkgs
-    https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager     
-  '';
+  system.stateVersion = "22.05";
   home-manager.users.magphi = {
     home.file.".bashrc".text = ''
       [[ $- != *i* ]] && return
@@ -129,10 +145,9 @@
       [ -f "/home/magphi/.ghcup/env" ] && source "/home/magphi/.ghcup/env"
       fish
     '';
-    home.file.".gitconfig".source = /nix/persist/home/.gitconfig;
     home.file.".nix-channels".text = ''
-      https://nixos.org/channels/nixos-unstable nixos
-      https://nixos.org/channels/nixpkgs-unstable nixpkgs
+      https://nixos.org/channels/nixos-22.05 nixos
+      https://nixos.org/channels/nixpkgs-22.05 nixpkgs
       https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager
     '';
     home.file.".minecraft/config".source = ./.minecraft/config;
@@ -144,7 +159,7 @@
     home.file.".minecraft/XaeroWaypoints".source = ./.minecraft/XaeroWaypoints;
     home.file.".minecraft/XaeroWaypoints_BACKUP032021".source = ./.minecraft/XaeroWaypoints_BACKUP032021;
     home.file.".xinitrc".text = ''
-      exec xmonad
+      exec qtile start
     '';
     home.file.".config/dunst/dunstrc".text = ''
       [global]
@@ -272,7 +287,7 @@
       gtk2="on"
       gtk3="on"
       de_version="on"
-      disk_show=('/' '/boot/efi')
+      disk_show=('/nix' '/boot')
       disk_subtitle="mount"
       disk_percent="on"
       colors=(distro)
@@ -380,14 +395,6 @@
       config.bind(',gr', 'config-cycle content.user_stylesheets ~/.config/qutebrowser/solarized-everything-css/css/gruvbox/gruvbox-all-sites.css ""')
       config.bind(',sd', 'config-cycle content.user_stylesheets ~/.config/qutebrowser/solarized-everything-css/css/solarized-dark/solarized-dark-all-sites.css ""')
       config.bind(',sl', 'config-cycle content.user_stylesheets ~/.config/qutebrowser/solarized-everything-css/css/solarized-light/solarized-light-all-sites.css ""')
-    '';
-    home.file.".config/qutebrowser/autoconfig.yml".source = /nix/persist/home/qutebrowser/autoconfig.yml;
-    home.file.".config/qutebrowser/greasemonkey".source = /nix/persist/home/qutebrowser/greasemonkey;
-    home.file.".config/qutebrowser/bookmarks".source = /nix/persist/home/qutebrowser/bookmarks;
-    home.file.".config/qutebrowser/quickmarks".source = /nix/persist/home/qutebrowser/quickmarks;
-    home.file.".config/rofi/config".text = ''
-      rofi.theme:	Arc-Dark
-      rofi.font:	Fira Code 22
     '';
   };
 }
