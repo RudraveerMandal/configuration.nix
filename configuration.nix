@@ -5,7 +5,7 @@ let
 in
 {
   imports =
-    [ <home-manager/nixos> (modulesPath + "/installer/scan/not-detected.nix") ];
+    [ "${home-manager}/nixos" (modulesPath + "/installer/scan/not-detected.nix") ];
   nixpkgs.config.allowBroken = true;
   nixpkgs.config.allowUnfree = true;
   hardware.bluetooth.enable = true;
@@ -221,18 +221,18 @@ in
             ]
           )
 	layouts = [
-      	layout.Columns(border_focus_stack=["#d75f5f", "#8f3d3d"], border_width=4),
-      	layout.Max(),
-      	layout.Stack(num_stacks=2),
-      	layout.Bsp(),
-      	layout.Matrix(),
-      	layout.MonadTall(),
-    	layout.MonadWide(),
-    	layout.RatioTile(),
-    	layout.Tile(),
-    	layout.TreeTab(),
-    	layout.VerticalTile(),
-    	layout.Zoomy(),
+      	  layout.Columns(border_focus_stack=["#d75f5f", "#8f3d3d"], border_width=4),
+      	  layout.Max(),
+      	  layout.Stack(num_stacks=2),
+      	  layout.Bsp(),
+      	  layout.Matrix(),
+      	  layout.MonadTall(),
+    	  layout.MonadWide(),
+    	  layout.RatioTile(),
+    	  layout.Tile(),
+    	  layout.TreeTab(),
+    	  layout.VerticalTile(),
+    	  layout.Zoomy(),
         ]
         widget_defaults = dict(
       	  font="Cascadia Code",
