@@ -1,6 +1,5 @@
 { config, pkgs, lib, modulesPath, ... }:
 let
-  version = "22.05";
   home-manager = builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/master.tar.gz";
 in
 {
@@ -14,6 +13,8 @@ in
     extraOptions = ''
       experimental-features = nix-command flakes
     '';
+    binaryCaches          = [ "https://hydra.iohk.io" "https://iohk.cachix.org" ];
+    binaryCachePublicKeys = [ "hydra.iohk.io:f/Ea+s+dFdN+3Y/G+FDgSq+a5NEWhJGzdjvKNGv0/EQ=" "iohk.cachix.org-1:DpRUyj7h7V830dp/i6Nti+NEO2/nhblbov/8MW7Rqoo=" ];
   };
   programs.steam = {
     enable = true;
@@ -28,18 +29,15 @@ in
   boot = {
     kernelPackages = pkgs.linuxPackages_zen;
     initrd.availableKernelModules = [ "xhci_pci" "ahci" "usb_storage" "sd_mod" "rtsx_pci_sdmmc" ];
-    initrd.kernelModules = [ ];
     kernelModules = [ "kvm-intel" ];
-    extraModulePackages = [ ];
     loader.systemd-boot.enable = true;
     loader.efi.canTouchEfiVariables = true;
-  
   };
   fileSystems = {
     "/" =
       { device = "none";
         fsType = "tmpfs";
-        options = [ "defaults" "size=500M" "mode=755" ];
+        options = [ "defaults" "size=2G" "mode=755" ];
       };
     "/nix" =
       { device = "/dev/sda3";
@@ -117,15 +115,11 @@ in
     users.root.initialHashedPassword = "$6$bAdD2kAwUHGKN8Iv$WwS4bvAV3L4fGdZ4JxNIVm85YIjqVZFhEDCgq0VlTwF.t4EH0h/2ab27.qzm8pvBdcDFd5unxtNXOMEzb8GZq/";
   };
   environment.systemPackages = with pkgs; [
-    neovim
-    vscode-with-extensions
     chromium
     git
     alacritty
     fish
     neofetch
-    cmatrix
-    bottom
     networkmanager 
     simplescreenrecorder
     qutebrowser
@@ -136,25 +130,34 @@ in
     wget
     bluez
     bluez-tools
-    appimage-run
     libsForQt5.filelight
     shutter
-    nodejs
     dunst
+    mpv
+    ani-cli
+    ghc
+    cabal-install
+    hlint
+    emacs
+    ghcid
+    haskellPackages.hlint
+    haskellPackages.hindent
+    haskellPackages.ghcid
+    emacs28Packages.hindent
+    emacs28Packages.haskell-mode
   ];
   system.stateVersion = "22.05";
   home-manager.users.magphi = {
+    home.stateVersion = "22.05";
     home.file = {
       ".bashrc".text = ''
         [[ $- != *i* ]] && return
         alias ls='ls --color=auto'
         PS1='[\u@\h \W]\$ '
-        export EDITOR="nvim"
+        export EDITOR="nano"
         neofetch
         xinput set-prop "ETPS/2 Elantech Touchpad" "libinput Disable While Typing Enabled" 0
-        export PATH="$PATH:$HOME/bin"
-        [ -f "/home/magphi/.ghcup/env" ] && source "/home/magphi/.ghcup/env"
-        fish
+        fish 
       '';  
       ".minecraft/config".source = ./.minecraft/config;
       ".minecraft/resourcepacks".source = ./.minecraft/resourcepacks;
@@ -168,129 +171,129 @@ in
         exec qtile start
       '';
       ".config/qtile/config.py".text = ''
-        from libqtile import bar, layout, widget
-        from libqtile.config import Click, Drag, Group, Key, Match, Screen
-        from libqtile.lazy import lazy
-        from libqtile.utils import guess_terminal
-        mod = "mod4"
-        terminal = guess_terminal()
-        keys = [
-      	  Key([mod], "h", lazy.layout.left(), desc="Move focus to left"),
-      	  Key([mod], "l", lazy.layout.right(), desc="Move focus to right"),
-      	  Key([mod], "j", lazy.layout.down(), desc="Move focus down"),
-      	  Key([mod], "k", lazy.layout.up(), desc="Move focus up"),
-       	  Key([mod], "space", lazy.layout.next(), desc="Move window focus to other window"),
-       	  Key([mod, "shift"], "h", lazy.layout.shuffle_left(), desc="Move window to the left"),
-      	  Key([mod, "shift"], "l", lazy.layout.shuffle_right(), desc="Move window to the right"),
-      	  Key([mod, "shift"], "j", lazy.layout.shuffle_down(), desc="Move window down"),
-      	  Key([mod, "shift"], "k", lazy.layout.shuffle_up(), desc="Move window up"),
-	  Key([mod, "control"], "h", lazy.layout.grow_left(), desc="Grow window to the left"),
-      	  Key([mod, "control"], "l", lazy.layout.grow_right(), desc="Grow window to the right"),
-      	  Key([mod, "control"], "j", lazy.layout.grow_down(), desc="Grow window down"),
-      	  Key([mod, "control"], "k", lazy.layout.grow_up(), desc="Grow window up"),
-      	  Key([mod], "n", lazy.layout.normalize(), desc="Reset all window sizes"),
-      	  Key(
-	    [mod, "shift"],
-            "Return",
-	    lazy.layout.toggle_split(),
-            desc="Toggle between split and unsplit sides of stack",
-          ),
-      	  Key([mod], "Return", lazy.spawn(terminal), desc="Launch terminal"),
-      	  Key([mod], "Tab", lazy.next_layout(), desc="Toggle between layouts"),
-      	  Key([mod], "w", lazy.window.kill(), desc="Kill focused window"),
-      	  Key([mod, "control"], "r", lazy.reload_config(), desc="Reload the config"),
-      	  Key([mod, "control"], "q", lazy.shutdown(), desc="Shutdown Qtile"),
-      	  Key([mod], "r", lazy.spawncmd(), desc="Spawn a command using a prompt widget"),
-        ]
-        groups = [Group(i) for i in "123456789"]
-        for i in groups:
-          keys.extend(
-            [
-              Key(
-                  [mod],
-                  i.name,
-                  lazy.group[i.name].toscreen(),
-                  desc="Switch to group {}".format(i.name),
-              ),
-              Key(
-                  [mod, "shift"],
-                  i.name,
-                  lazy.window.togroup(i.name, switch_group=True),
-                  desc="Switch to & move focused window to group {}".format(i.name),
-              ),
-            ]
-          )
-	layouts = [
-      	  layout.Columns(border_focus_stack=["#d75f5f", "#8f3d3d"], border_width=4),
-      	  layout.Max(),
-      	  layout.Stack(num_stacks=2),
-      	  layout.Bsp(),
-      	  layout.Matrix(),
-      	  layout.MonadTall(),
-    	  layout.MonadWide(),
-    	  layout.RatioTile(),
-    	  layout.Tile(),
-    	  layout.TreeTab(),
-    	  layout.VerticalTile(),
-    	  layout.Zoomy(),
-        ]
-        widget_defaults = dict(
-      	  font="Cascadia Code",
-      	  fontsize=12,
-      	  padding=3,
+from libqtile import bar, layout, widget
+from libqtile.config import Click, Drag, Group, Key, Match, Screen
+from libqtile.lazy import lazy
+from libqtile.utils import guess_terminal
+mod = "mod4"
+terminal = guess_terminal()
+keys = [
+	Key([mod], "h", lazy.layout.left(), desc="Move focus to left"),
+      	Key([mod], "l", lazy.layout.right(), desc="Move focus to right"),
+      	Key([mod], "j", lazy.layout.down(), desc="Move focus down"),
+      	Key([mod], "k", lazy.layout.up(), desc="Move focus up"),
+       	Key([mod], "space", lazy.layout.next(), desc="Move window focus to other window"),
+       	Key([mod, "shift"], "h", lazy.layout.shuffle_left(), desc="Move window to the left"),
+      	Key([mod, "shift"], "l", lazy.layout.shuffle_right(), desc="Move window to the right"),
+      	Key([mod, "shift"], "j", lazy.layout.shuffle_down(), desc="Move window down"),
+      	Key([mod, "shift"], "k", lazy.layout.shuffle_up(), desc="Move window up"),
+	Key([mod, "control"], "h", lazy.layout.grow_left(), desc="Grow window to the left"),
+      	Key([mod, "control"], "l", lazy.layout.grow_right(), desc="Grow window to the right"),
+      	Key([mod, "control"], "j", lazy.layout.grow_down(), desc="Grow window down"),
+      	Key([mod, "control"], "k", lazy.layout.grow_up(), desc="Grow window up"),
+      	Key([mod], "n", lazy.layout.normalize(), desc="Reset all window sizes"),
+      	Key(
+		[mod, "shift"],
+        	"Return",
+		lazy.layout.toggle_split(),
+        	desc="Toggle between split and unsplit sides of stack",
+        ),
+      	Key([mod], "Return", lazy.spawn(terminal), desc="Launch terminal"),
+      	Key([mod], "Tab", lazy.next_layout(), desc="Toggle between layouts"),
+      	Key([mod], "w", lazy.window.kill(), desc="Kill focused window"),
+      	Key([mod, "control"], "r", lazy.reload_config(), desc="Reload the config"),
+      	Key([mod, "control"], "q", lazy.shutdown(), desc="Shutdown Qtile"),
+      	Key([mod], "r", lazy.spawncmd(), desc="Spawn a command using a prompt widget"),
+]
+groups = [Group(i) for i in "123456789"]
+for i in groups:
+        keys.extend(
+        	[
+        		Key(
+        			[mod],
+                  		i.name,
+                  		lazy.group[i.name].toscreen(),
+                  		desc="Switch to group {}".format(i.name),
+              		),
+              		Key(
+                  		[mod, "shift"],
+                  		i.name,
+                  		lazy.window.togroup(i.name, switch_group=True),
+                  		desc="Switch to & move focused window to group {}".format(i.name),
+              		),
+            	]
         )
-        extension_defaults = widget_defaults.copy()
-        screens = [
-      	  Screen(
-            bottom=bar.Bar(
-              [
-                widget.CurrentLayout(),
-               	widget.GroupBox(),
-                widget.Prompt(),
-        	widget.WindowName(),
-                widget.Chord(
-                  chords_colors={
-                    "launch": ("#ff0000", "#ffffff"),
-                  },
-                  name_transform=lambda name: name.upper(),
-                ),
-                widget.TextBox("default config", name="default"),
-                widget.TextBox("Press &lt;M-r&gt; to spawn", foreground="#d75f5f"),
-                widget.Systray(),
-                widget.Clock(format="%Y-%m-%d %a %I:%M %p"),
-                widget.QuickExit(),
-              ],
-              24,
-            ),
-    	  ),
-        ]
-        mouse = [
-      	  Drag([mod], "Button1", lazy.window.set_position_floating(), start=lazy.window.get_position()),
-      	  Drag([mod], "Button3", lazy.window.set_size_floating(), start=lazy.window.get_size()),
-      	  Click([mod], "Button2", lazy.window.bring_to_front()),
-        ]
-        dgroups_key_binder = None
-        dgroups_app_rules = []
-        follow_mouse_focus = True
-        bring_front_click = False
-        cursor_warp = False
-        floating_layout = layout.Floating(
-      	  float_rules=[
-            *layout.Floating.default_float_rules,
-            Match(wm_class="confirmreset"),
-            Match(wm_class="makebranch"),
-            Match(wm_class="maketag"),
-            Match(wm_class="ssh-askpass"),
-            Match(title="branchdialog"),
-            Match(title="pinentry"),
-      	  ]
-        )	
-        auto_fullscreen = True
-        focus_on_window_activation = "smart"
-        reconfigure_screens = True
-        auto_minimize = True
-        wl_input_rules = None
-        wmname = "Qtile"
+layouts = [
+	layout.Columns(border_focus_stack=["#d75f5f", "#8f3d3d"], border_width=4),
+      	layout.Max(),
+      	layout.Stack(num_stacks=2),
+      	layout.Bsp(),
+      	layout.Matrix(),
+      	layout.MonadTall(),
+    	layout.MonadWide(),
+    	layout.RatioTile(),
+    	layout.Tile(),
+    	layout.TreeTab(),
+    	layout.VerticalTile(),
+    	layout.Zoomy(),
+]
+widget_defaults = dict(
+	font="Cascadia Code",
+	fontsize=12,
+      	padding=3,
+)
+extension_defaults = widget_defaults.copy()
+screens = [
+	Screen(
+        	bottom=bar.Bar(
+              		[
+                		widget.CurrentLayout(),
+               			widget.GroupBox(),
+                		widget.Prompt(),
+        			widget.WindowName(),
+                		widget.Chord(
+                  			chords_colors={
+                    				"launch": ("#ff0000", "#ffffff"),
+                  			},
+                  			name_transform=lambda name: name.upper(),
+                		),
+                		widget.TextBox("default config", name="default"),
+                		widget.TextBox("Press &lt;M-r&gt; to spawn", foreground="#d75f5f"),
+                		widget.Systray(),
+                		widget.Clock(format="%Y-%m-%d %a %I:%M %p"),
+                		widget.QuickExit(),
+              		],
+              		24,
+        	),
+	),
+]
+mouse = [
+	Drag([mod], "Button1", lazy.window.set_position_floating(), start=lazy.window.get_position()),
+      	Drag([mod], "Button3", lazy.window.set_size_floating(), start=lazy.window.get_size()),
+      	Click([mod], "Button2", lazy.window.bring_to_front()),
+]
+dgroups_key_binder = None
+dgroups_app_rules = []
+follow_mouse_focus = True
+bring_front_click = False
+cursor_warp = False
+floating_layout = layout.Floating(
+	float_rules=[
+        	*layout.Floating.default_float_rules,
+            	Match(wm_class="confirmreset"),
+            	Match(wm_class="makebranch"),
+            	Match(wm_class="maketag"),
+            	Match(wm_class="ssh-askpass"),
+            	Match(title="branchdialog"),
+            	Match(title="pinentry"),
+      	]
+)	
+auto_fullscreen = True
+focus_on_window_activation = "smart"
+reconfigure_screens = True
+auto_minimize = True
+wl_input_rules = None
+wmname = "Qtile"
       '';
       ".config/dunst/dunstrc".text = ''
         [global]
@@ -473,81 +476,81 @@ font:
   size: 12.0
     '';
       ".config/qutebrowser/config.py".text = ''
-        config.load_autoconfig(False)
-        c.aliases = {'q': 'quit', 'w': 'session-save', 'wq': 'quit --save'}
-        c.fonts.default_family = '"Cascadia Code"'
-        c.fonts.default_size = '11pt'
-        c.fonts.completion.entry = '11pt "Cascadia Code"'
-        c.fonts.debug_console = '11pt "Cascadia Code"'
-        c.fonts.prompts = 'default_size sans-serif'
-        c.fonts.statusbar = '11pt "Cascadia Code"'
-        config.set('content.cookies.accept', 'all', 'chrome-devtools://*')
-        config.set('content.cookies.accept', 'all', 'devtools://*')
-        config.set('content.headers.user_agent', 'Mozilla/5.0 ({os_info}) AppleWebKit/{webkit_version} (KHTML, like Gecko) {upstream_browser_key}/{upstream_browser_version} Safari/{webkit_version}', 'https://web.whatsapp.com/')
-        config.set('content.headers.user_agent', 'Mozilla/5.0 ({os_info}; rv:71.0) Gecko/20100101 Firefox/71.0', 'https://accounts.google.com/*')
-        config.set('content.headers.user_agent', 'Mozilla/5.0 ({os_info}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99 Safari/537.36', 'https://*.slack.com/*')
-        config.set('content.headers.user_agent', 'Mozilla/5.0 ({os_info}; rv:71.0) Gecko/20100101 Firefox/71.0', 'https://docs.google.com/*')
-        config.set('content.headers.user_agent', 'Mozilla/5.0 ({os_info}; rv:71.0) Gecko/20100101 Firefox/71.0', 'https://drive.google.com/*')
-        config.set('content.images', True, 'chrome-devtools://*')
-        config.set('content.images', True, 'devtools://*')
-        config.set('content.javascript.enabled', True, 'chrome-devtools://*')
-        config.set('content.javascript.enabled', True, 'devtools://*')
-        config.set('content.javascript.enabled', True, 'chrome://*/*')
-        config.set('content.javascript.enabled', True, 'qute://*/*')
-        c.downloads.location.directory = '~/Downloads'
-        c.tabs.show = 'switching'
-        c.url.default_page = 'https://google.com'
-        c.url.start_pages = 'https://google.com'
-        c.url.searchengines = {'ddg': 'https://duckduckgo.com/?q={}', 'am': 'https://www.amazon.com/s?k={}', 'aw': 'https://wiki.archlinux.org/?search={}', 'DEFAULT': 'https://www.google.com/search?q={}', 'hoog': 'https://hoogle.haskell.org/?hoogle={}', 're': 'https://www.reddit.com/r/{}', 'ub': 'https://www.urbandictionary.com/define.php?term={}', 'wiki': 'https://en.wikipedia.org/wiki/{}', 'yt': 'https://www.youtube.com/results?search_query={}'}
-        c.colors.completion.fg = ['#9cc4ff', 'white', 'white']
-        c.colors.completion.odd.bg = '#1c1f24'
-        c.colors.completion.even.bg = '#232429'
-        c.colors.completion.category.fg = '#e1acff'
-        c.colors.completion.category.bg = 'qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #000000, stop:1 #232429)'
-        c.colors.completion.category.border.top = '#3f4147'
-        c.colors.completion.category.border.bottom = '#3f4147'
-        c.colors.completion.item.selected.fg = '#282c34'
-        c.colors.completion.item.selected.bg = '#ecbe7b'
-        c.colors.completion.item.selected.match.fg = '#c678dd'
-        c.colors.completion.match.fg = '#c678dd'
-        c.colors.completion.scrollbar.fg = 'white'
-        c.colors.downloads.bar.bg = '#282c34'
-        c.colors.downloads.error.bg = '#ff6c6b'
-        c.colors.hints.fg = '#282c34'
-        c.colors.hints.match.fg = '#98be65'
-        c.colors.messages.info.bg = '#282c34'
-        c.colors.statusbar.normal.bg = '#282c34'
-        c.colors.statusbar.insert.fg = 'white'
-        c.colors.statusbar.insert.bg = '#497920'
-        c.colors.statusbar.passthrough.bg = '#34426f'
-        c.colors.statusbar.command.bg = '#282c34'
-        c.colors.statusbar.url.warn.fg = 'yellow'
-        c.colors.tabs.bar.bg = '#1c1f34'
-        c.colors.tabs.odd.bg = '#282c34'
-        c.colors.tabs.even.bg = '#282c34'
-        c.colors.tabs.selected.odd.bg = '#282c34'
-        c.colors.tabs.selected.even.bg = '#282c34'
-        c.colors.tabs.pinned.odd.bg = 'seagreen'
-        c.colors.tabs.pinned.even.bg = 'darkseagreen'
-        c.colors.tabs.pinned.selected.odd.bg = '#282c34'
-        c.colors.tabs.pinned.selected.even.bg = '#282c34'
-        c.fonts.default_family = '"Source Code Pro"'
-        c.fonts.default_size = '11pt'
-        c.fonts.completion.entry = '11pt "Source Code Pro"'
-        c.fonts.debug_console = '11pt "Source Code Pro"'
-        c.fonts.prompts = 'default_size sans-serif'
-        c.fonts.statusbar = '11pt "Source Code Pro"'
-        config.bind('M', 'hint links spawn mpv {hint-url}')
-        config.bind('Z', 'hint links spawn st -e youtube-dl {hint-url}')
-        config.bind('t', 'set-cmd-text -s :open -t')
-        config.bind('xb', 'config-cycle statusbar.show always never')
-        config.bind('xt', 'config-cycle tabs.show always never')
-        config.bind('xx', 'config-cycle statusbar.show always never;; config-cycle tabs.show always never')
-        config.bind(',ap', 'config-cycle content.user_stylesheets ~/.config/qutebrowser/solarized-everything-css/css/apprentice/apprentice-all-sites.css ""')
-        config.bind(',dr', 'config-cycle content.user_stylesheets ~/.config/qutebrowser/solarized-everything-css/css/darculized/darculized-all-sites.css ""')
-        config.bind(',gr', 'config-cycle content.user_stylesheets ~/.config/qutebrowser/solarized-everything-css/css/gruvbox/gruvbox-all-sites.css ""')
-        config.bind(',sd', 'config-cycle content.user_stylesheets ~/.config/qutebrowser/solarized-everything-css/css/solarized-dark/solarized-dark-all-sites.css ""')
-        config.bind(',sl', 'config-cycle content.user_stylesheets ~/.config/qutebrowser/solarized-everything-css/css/solarized-light/solarized-light-all-sites.css ""')
+config.load_autoconfig(False)
+c.aliases = {'q': 'quit', 'w': 'session-save', 'wq': 'quit --save'}
+c.fonts.default_family = '"Cascadia Code"'
+c.fonts.default_size = '11pt'
+c.fonts.completion.entry = '11pt "Cascadia Code"'
+c.fonts.debug_console = '11pt "Cascadia Code"'
+c.fonts.prompts = 'default_size sans-serif'
+c.fonts.statusbar = '11pt "Cascadia Code"'
+config.set('content.cookies.accept', 'all', 'chrome-devtools://*')
+config.set('content.cookies.accept', 'all', 'devtools://*')
+config.set('content.headers.user_agent', 'Mozilla/5.0 ({os_info}) AppleWebKit/{webkit_version} (KHTML, like Gecko) {upstream_browser_key}/{upstream_browser_version} Safari/{webkit_version}', 'https://web.whatsapp.com/')
+config.set('content.headers.user_agent', 'Mozilla/5.0 ({os_info}; rv:71.0) Gecko/20100101 Firefox/71.0', 'https://accounts.google.com/*')
+config.set('content.headers.user_agent', 'Mozilla/5.0 ({os_info}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99 Safari/537.36', 'https://*.slack.com/*')
+config.set('content.headers.user_agent', 'Mozilla/5.0 ({os_info}; rv:71.0) Gecko/20100101 Firefox/71.0', 'https://docs.google.com/*')
+config.set('content.headers.user_agent', 'Mozilla/5.0 ({os_info}; rv:71.0) Gecko/20100101 Firefox/71.0', 'https://drive.google.com/*')
+config.set('content.images', True, 'chrome-devtools://*')
+config.set('content.images', True, 'devtools://*')
+config.set('content.javascript.enabled', True, 'chrome-devtools://*')
+config.set('content.javascript.enabled', True, 'devtools://*')
+config.set('content.javascript.enabled', True, 'chrome://*/*')
+config.set('content.javascript.enabled', True, 'qute://*/*')
+c.downloads.location.directory = '~/Downloads'
+c.tabs.show = 'switching'
+c.url.default_page = 'https://google.com'
+c.url.start_pages = 'https://google.com'
+c.url.searchengines = {'ddg': 'https://duckduckgo.com/?q={}', 'am': 'https://www.amazon.com/s?k={}', 'aw': 'https://wiki.archlinux.org/?search={}', 'DEFAULT': 'https://www.google.com/search?q={}', 'hoog': 'https://hoogle.haskell.org/?hoogle={}', 're': 'https://www.reddit.com/r/{}', 'ub': 'https://www.urbandictionary.com/define.php?term={}', 'wiki': 'https://en.wikipedia.org/wiki/{}', 'yt': 'https://www.youtube.com/results?search_query={}'}
+c.colors.completion.fg = ['#9cc4ff', 'white', 'white']
+c.colors.completion.odd.bg = '#1c1f24'
+c.colors.completion.even.bg = '#232429'
+c.colors.completion.category.fg = '#e1acff'
+c.colors.completion.category.bg = 'qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #000000, stop:1 #232429)'
+c.colors.completion.category.border.top = '#3f4147'
+c.colors.completion.category.border.bottom = '#3f4147'
+c.colors.completion.item.selected.fg = '#282c34'
+c.colors.completion.item.selected.bg = '#ecbe7b'
+c.colors.completion.item.selected.match.fg = '#c678dd'
+c.colors.completion.match.fg = '#c678dd'
+c.colors.completion.scrollbar.fg = 'white'
+c.colors.downloads.bar.bg = '#282c34'
+c.colors.downloads.error.bg = '#ff6c6b'
+c.colors.hints.fg = '#282c34'
+c.colors.hints.match.fg = '#98be65'
+c.colors.messages.info.bg = '#282c34'
+c.colors.statusbar.normal.bg = '#282c34'
+c.colors.statusbar.insert.fg = 'white'
+c.colors.statusbar.insert.bg = '#497920'
+c.colors.statusbar.passthrough.bg = '#34426f'
+c.colors.statusbar.command.bg = '#282c34'
+c.colors.statusbar.url.warn.fg = 'yellow'
+c.colors.tabs.bar.bg = '#1c1f34'
+c.colors.tabs.odd.bg = '#282c34'
+c.colors.tabs.even.bg = '#282c34'
+c.colors.tabs.selected.odd.bg = '#282c34'
+c.colors.tabs.selected.even.bg = '#282c34'
+c.colors.tabs.pinned.odd.bg = 'seagreen'
+c.colors.tabs.pinned.even.bg = 'darkseagreen'
+c.colors.tabs.pinned.selected.odd.bg = '#282c34'
+c.colors.tabs.pinned.selected.even.bg = '#282c34'
+c.fonts.default_family = '"Source Code Pro"'
+c.fonts.default_size = '11pt'
+c.fonts.completion.entry = '11pt "Source Code Pro"'
+c.fonts.debug_console = '11pt "Source Code Pro"'
+c.fonts.prompts = 'default_size sans-serif'
+c.fonts.statusbar = '11pt "Source Code Pro"'
+config.bind('M', 'hint links spawn mpv {hint-url}')
+config.bind('Z', 'hint links spawn st -e youtube-dl {hint-url}')
+config.bind('t', 'set-cmd-text -s :open -t')
+config.bind('xb', 'config-cycle statusbar.show always never')
+config.bind('xt', 'config-cycle tabs.show always never')
+config.bind('xx', 'config-cycle statusbar.show always never;; config-cycle tabs.show always never')
+config.bind(',ap', 'config-cycle content.user_stylesheets ~/.config/qutebrowser/solarized-everything-css/css/apprentice/apprentice-all-sites.css ""')
+config.bind(',dr', 'config-cycle content.user_stylesheets ~/.config/qutebrowser/solarized-everything-css/css/darculized/darculized-all-sites.css ""')
+config.bind(',gr', 'config-cycle content.user_stylesheets ~/.config/qutebrowser/solarized-everything-css/css/gruvbox/gruvbox-all-sites.css ""')
+config.bind(',sd', 'config-cycle content.user_stylesheets ~/.config/qutebrowser/solarized-everything-css/css/solarized-dark/solarized-dark-all-sites.css ""')
+config.bind(',sl', 'config-cycle content.user_stylesheets ~/.config/qutebrowser/solarized-everything-css/css/solarized-light/solarized-light-all-sites.css ""')
       '';
     };
   };
