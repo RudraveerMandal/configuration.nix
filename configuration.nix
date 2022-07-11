@@ -135,16 +135,7 @@ in
     dunst
     mpv
     ani-cli
-    ghc
-    cabal-install
-    hlint
-    emacs
-    ghcid
-    haskellPackages.hlint
-    haskellPackages.hindent
-    haskellPackages.ghcid
-    emacs28Packages.hindent
-    emacs28Packages.haskell-mode
+    guile_3_0
   ];
   system.stateVersion = "22.05";
   home-manager.users.magphi = {
