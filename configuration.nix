@@ -9,12 +9,7 @@ in
   nixpkgs.config.allowUnfree = true;
   hardware.bluetooth.enable = true;
   nix = {
-    package = pkgs.nixFlakes;
-    extraOptions = ''
-      experimental-features = nix-command flakes
-    '';
-    binaryCaches          = [ "https://hydra.iohk.io" "https://iohk.cachix.org" ];
-    binaryCachePublicKeys = [ "hydra.iohk.io:f/Ea+s+dFdN+3Y/G+FDgSq+a5NEWhJGzdjvKNGv0/EQ=" "iohk.cachix.org-1:DpRUyj7h7V830dp/i6Nti+NEO2/nhblbov/8MW7Rqoo=" ];
+    package = pkgs.nixVersions.unstable;
   };
   programs.steam = {
     enable = true;
@@ -22,8 +17,6 @@ in
     dedicatedServer.openFirewall = true;
   };
   virtualisation = {
-    waydroid. enable = true;
-    lxd.enable = true;
     docker.enable = true;
   };
   boot = {
@@ -35,45 +28,15 @@ in
   };
   fileSystems = {
     "/" =
-      { device = "none";
-        fsType = "tmpfs";
-        options = [ "defaults" "size=2G" "mode=755" ];
-      };
-    "/nix" =
       { device = "/dev/sda3";
         fsType = "btrfs";
-        options = [ "defaults" "ssd" "space_cache" "subvol=nix" ];
+        options = [ "defaults" "ssd" ];
       };
     "/boot" =
       { device = "/dev/sda1";
         fsType = "vfat";
       };
-    "/var/log" =
-      { device = "/dev/sda3";
-        options = [ "defaults" "ssd" "space_cache" "subvol=var/log" ];
-        fsType = "btrfs";
-      };
-    "/etc/nixos" =
-      { device = "/dev/sda3";
-        options = [ "defaults" "ssd" "space_cache" "subvol=etc/nixos" ];
-        fsType = "btrfs";
-      };
-    "/var/lib" =
-      { device = "/dev/sda3";
-        options = [ "defaults" "ssd" "space_cache" "subvol=var/lib" ];
-        fsType = "btrfs";
-      };
-    "/etc/NetworkManager/system-connections" = 
-      { device = "/dev/sda3";
-        options = [ "defaults" "ssd" "space_cache" "subvol=etc/NetworkManager/system-connections" ];
-        fsType = "btrfs";
-      };
-    "/home" =
-      { device = "/dev/sda3";
-        options = [ "defaults" "ssd" "space_cache" "subvol=home" ];
-        fsType = "btrfs";
-      };
-  };
+    };
   swapDevices =
     [ { device = "/dev/sda2"; }
     ];
@@ -82,7 +45,7 @@ in
   networking.hostName = "lallantop";
   time.timeZone = "Asia/Kolkata";
   networking.networkmanager.enable = true;
-  i18n.defaultLocale = "en_IN.UTF-8";
+  i18n.defaultLocale = "en_IN";
   console = {
     font = "Lat2-Terminus16";
     keyMap = "us";
@@ -120,22 +83,17 @@ in
     alacritty
     fish
     neofetch
-    networkmanager 
-    simplescreenrecorder
+    networkmanager
     qutebrowser
     pavucontrol
     unzip
     spotify
     home-manager
     wget
-    bluez
-    bluez-tools
-    libsForQt5.filelight
+    nodejs
+    surrealdb
     shutter
-    dunst
-    mpv
-    ani-cli
-    guile_3_0
+    clang
   ];
   system.stateVersion = "22.05";
   home-manager.users.magphi = {
